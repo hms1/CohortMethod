@@ -81,17 +81,12 @@ FROM (
 	FROM (
 }
 {@remove_duplicate_subjects == 'keep first'} ? {
-
+	WITH all_cohort_numbers AS (
 		SELECT subject_id,
 		  cohort_definition_id,
 		  cohort_start_date,
-		  cohort_end_date
-		FROM (
-			SELECT subject_id,
-			  cohort_definition_id,
-			  cohort_start_date,
-			  cohort_end_date,
-			  ROW_NUMBER() OVER (PARTITION BY subject_id ORDER BY cohort_start_date) AS cohort_number
+		  cohort_end_date,
+		  ROW_NUMBER() OVER (PARTITION BY subject_id ORDER BY cohort_start_date) AS cohort_number
 		FROM (
 }
 {@exposure_table == 'drug_era' } ? {
@@ -162,8 +157,8 @@ FROM (
 	}
 }
 {@remove_duplicate_subjects == 'keep first'} ? {
-	) temp1
-  ) temp2
+  ) temp)
+  SELECT * from all_cohort_numbers
   WHERE cohort_number = 1
 }
 	) raw_cohorts
